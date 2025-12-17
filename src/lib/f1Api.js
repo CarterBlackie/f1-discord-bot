@@ -50,7 +50,7 @@ export async function getDriverSeason(driverId, season) {
   return data.MRData.StandingsTable.StandingsLists[0]?.DriverStandings[0];
 }
 
-// NEW: last race results with fastest lap
+
 export async function getLastRaceResults() {
   const data = await fetchJson(`${BASE}/current/last/results.json?limit=1000`);
   const race = data?.MRData?.RaceTable?.Races?.[0];
@@ -70,3 +70,38 @@ export async function getLastRaceResults() {
     results,
   };
 }
+
+export async function getConstructors(season) {
+  const p = seasonPrefix(season);
+  const data = await fetchJson(`${BASE}/${p}/constructors.json?limit=100`);
+  return data.MRData.ConstructorTable.Constructors;
+}
+
+export async function getTeamSeason(season, constructorId) {
+  const p = seasonPrefix(season);
+
+  const standings = await fetchJson(
+    `${BASE}/${p}/constructorStandings.json`
+  );
+
+  const row =
+    standings.MRData.StandingsTable.StandingsLists[0]
+      ?.ConstructorStandings
+      ?.find(c => c.Constructor.constructorId === constructorId);
+
+  if (!row) return null;
+
+  const driversData = await fetchJson(
+    `${BASE}/${p}/constructors/${constructorId}/drivers.json`
+  );
+
+  return {
+    position: row.position,
+    points: row.points,
+    wins: row.wins,
+    name: row.Constructor.name,
+    constructorId,
+    drivers: driversData.MRData.DriverTable.Drivers,
+  };
+}
+

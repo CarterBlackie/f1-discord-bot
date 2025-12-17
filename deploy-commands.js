@@ -22,7 +22,7 @@ const seasonChoices = [
 const commands = [
   new SlashCommandBuilder()
     .setName("next_race")
-    .setDescription("Show the next F1 race (date/time + location).")
+    .setDescription("Show the next F1 race.")
     .toJSON(),
 
   new SlashCommandBuilder()
@@ -32,10 +32,9 @@ const commands = [
 
   new SlashCommandBuilder()
     .setName("standings")
-    .setDescription("Show F1 standings by season.")
-    .addStringOption((opt) =>
-      opt
-        .setName("type")
+    .setDescription("Show F1 standings.")
+    .addStringOption(opt =>
+      opt.setName("type")
         .setDescription("Drivers or constructors")
         .setRequired(true)
         .addChoices(
@@ -43,11 +42,9 @@ const commands = [
           { name: "Constructors", value: "constructors" }
         )
     )
-    .addStringOption((opt) =>
-      opt
-        .setName("season")
-        .setDescription("Season year")
-        .setRequired(false)
+    .addStringOption(opt =>
+      opt.setName("season")
+        .setDescription("Season")
         .addChoices(...seasonChoices)
     )
     .toJSON(),
@@ -55,18 +52,32 @@ const commands = [
   new SlashCommandBuilder()
     .setName("driver")
     .setDescription("Show a driver's season stats.")
-    .addStringOption((opt) =>
-      opt
-        .setName("name")
-        .setDescription("Driver name (autocomplete)")
+    .addStringOption(opt =>
+      opt.setName("name")
+        .setDescription("Driver (autocomplete)")
         .setRequired(true)
         .setAutocomplete(true)
     )
-    .addStringOption((opt) =>
-      opt
-        .setName("season")
-        .setDescription("Season year")
-        .setRequired(false)
+    .addStringOption(opt =>
+      opt.setName("season")
+        .setDescription("Season")
+        .addChoices(...seasonChoices)
+    )
+    .toJSON(),
+
+  // ✅ NEW
+  new SlashCommandBuilder()
+    .setName("team")
+    .setDescription("Show a constructor's season stats.")
+    .addStringOption(opt =>
+      opt.setName("name")
+        .setDescription("Team name")
+        .setRequired(true)
+        .setAutocomplete(true)
+    )
+    .addStringOption(opt =>
+      opt.setName("season")
+        .setDescription("Season")
         .addChoices(...seasonChoices)
     )
     .toJSON(),
@@ -74,13 +85,9 @@ const commands = [
 
 const rest = new REST({ version: "10" }).setToken(token);
 
-try {
-  console.log("Registering slash commands (guild)...");
-  await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
-    body: commands,
-  });
-  console.log("Done.");
-} catch (err) {
-  console.error(err);
-  process.exit(1);
-}
+await rest.put(
+  Routes.applicationGuildCommands(clientId, guildId),
+  { body: commands }
+);
+
+console.log("Commands deployed.");

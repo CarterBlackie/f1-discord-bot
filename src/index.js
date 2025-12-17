@@ -5,6 +5,8 @@ import { handleNextRace } from "./commands/nextRace.js";
 import { handleStandings } from "./commands/standings.js";
 import { handleDriver, handleDriverAutocomplete } from "./commands/driver.js";
 import { handleLastRace } from "./commands/lastRace.js";
+import { handleTeam, handleTeamAutocomplete } from "./commands/team.js";
+
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds],
@@ -18,6 +20,9 @@ client.on("interactionCreate", async (interaction) => {
   if (interaction.isAutocomplete()) {
     if (interaction.commandName === "driver") {
       return handleDriverAutocomplete(interaction);
+    }
+    if (interaction.commandName === "team") {
+      return handleTeamAutocomplete(interaction);
     }
   }
 
