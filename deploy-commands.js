@@ -11,17 +11,23 @@ if (!token || !clientId || !guildId) {
 
 const seasonChoices = [
   { name: "Current", value: "current" },
+  { name: "2025", value: "2025" },
   { name: "2024", value: "2024" },
   { name: "2023", value: "2023" },
   { name: "2022", value: "2022" },
   { name: "2021", value: "2021" },
-  { name: "2020", value: "2020" }
+  { name: "2020", value: "2020" },
 ];
 
 const commands = [
   new SlashCommandBuilder()
     .setName("next_race")
     .setDescription("Show the next F1 race (date/time + location).")
+    .toJSON(),
+
+  new SlashCommandBuilder()
+    .setName("last_race")
+    .setDescription("Show the last F1 race (top 3 + fastest lap).")
     .toJSON(),
 
   new SlashCommandBuilder()
@@ -36,6 +42,25 @@ const commands = [
           { name: "Drivers", value: "drivers" },
           { name: "Constructors", value: "constructors" }
         )
+    )
+    .addStringOption((opt) =>
+      opt
+        .setName("season")
+        .setDescription("Season year")
+        .setRequired(false)
+        .addChoices(...seasonChoices)
+    )
+    .toJSON(),
+
+  new SlashCommandBuilder()
+    .setName("driver")
+    .setDescription("Show a driver's season stats.")
+    .addStringOption((opt) =>
+      opt
+        .setName("name")
+        .setDescription("Driver name (autocomplete)")
+        .setRequired(true)
+        .setAutocomplete(true)
     )
     .addStringOption((opt) =>
       opt
