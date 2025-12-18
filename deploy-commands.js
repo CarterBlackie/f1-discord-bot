@@ -21,8 +21,18 @@ const seasonChoices = [
 
 const commands = [
   new SlashCommandBuilder()
+    .setName("help")
+    .setDescription("Show bot commands and examples.")
+    .toJSON(),
+
+  new SlashCommandBuilder()
+    .setName("status")
+    .setDescription("Show bot uptime and API status.")
+    .toJSON(),
+
+  new SlashCommandBuilder()
     .setName("next_race")
-    .setDescription("Show the next F1 race.")
+    .setDescription("Show the next F1 race (with countdown).")
     .toJSON(),
 
   new SlashCommandBuilder()
@@ -32,9 +42,10 @@ const commands = [
 
   new SlashCommandBuilder()
     .setName("standings")
-    .setDescription("Show F1 standings.")
-    .addStringOption(opt =>
-      opt.setName("type")
+    .setDescription("Show F1 standings (with pages).")
+    .addStringOption((opt) =>
+      opt
+        .setName("type")
         .setDescription("Drivers or constructors")
         .setRequired(true)
         .addChoices(
@@ -42,9 +53,11 @@ const commands = [
           { name: "Constructors", value: "constructors" }
         )
     )
-    .addStringOption(opt =>
-      opt.setName("season")
-        .setDescription("Season")
+    .addStringOption((opt) =>
+      opt
+        .setName("season")
+        .setDescription("Season year")
+        .setRequired(false)
         .addChoices(...seasonChoices)
     )
     .toJSON(),
@@ -52,32 +65,37 @@ const commands = [
   new SlashCommandBuilder()
     .setName("driver")
     .setDescription("Show a driver's season stats.")
-    .addStringOption(opt =>
-      opt.setName("name")
-        .setDescription("Driver (autocomplete)")
+    .addStringOption((opt) =>
+      opt
+        .setName("name")
+        .setDescription("Driver name (autocomplete)")
         .setRequired(true)
         .setAutocomplete(true)
     )
-    .addStringOption(opt =>
-      opt.setName("season")
-        .setDescription("Season")
+    .addStringOption((opt) =>
+      opt
+        .setName("season")
+        .setDescription("Season year")
+        .setRequired(false)
         .addChoices(...seasonChoices)
     )
     .toJSON(),
 
-  // ✅ NEW
   new SlashCommandBuilder()
     .setName("team")
     .setDescription("Show a constructor's season stats.")
-    .addStringOption(opt =>
-      opt.setName("name")
-        .setDescription("Team name")
+    .addStringOption((opt) =>
+      opt
+        .setName("name")
+        .setDescription("Team name (autocomplete)")
         .setRequired(true)
         .setAutocomplete(true)
     )
-    .addStringOption(opt =>
-      opt.setName("season")
-        .setDescription("Season")
+    .addStringOption((opt) =>
+      opt
+        .setName("season")
+        .setDescription("Season year")
+        .setRequired(false)
         .addChoices(...seasonChoices)
     )
     .toJSON(),
@@ -85,9 +103,13 @@ const commands = [
 
 const rest = new REST({ version: "10" }).setToken(token);
 
-await rest.put(
-  Routes.applicationGuildCommands(clientId, guildId),
-  { body: commands }
-);
-
-console.log("Commands deployed.");
+try {
+  console.log("Registering slash commands (guild)...");
+  await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
+    body: commands,
+  });
+  console.log("Done.");
+} catch (err) {
+  console.error(err);
+  process.exit(1);
+}
