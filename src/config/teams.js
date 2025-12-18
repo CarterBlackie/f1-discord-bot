@@ -11,9 +11,13 @@ export const TEAM_COLORS = {
   sauber: 0x00e701,
   alfa: 0x900000,
   haas: 0xffffff,
+  renault: 0xffcc00,
+  racing_point: 0xf596c8,
+  force_india: 0xff5f00,
 };
 
 export const DEFAULT_COLOR = 0xff5aa5;
+export const EMBED_FOOTER = "F1 Stats Bot • Data via Jolpica (Ergast-compatible)";
 
 export function pickTeamColor(constructorId) {
   return TEAM_COLORS[constructorId] ?? DEFAULT_COLOR;
